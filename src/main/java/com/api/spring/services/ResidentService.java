@@ -4,9 +4,10 @@ import java.util.List;
 
 import javax.transaction.Transactional;
 
-import org.hibernate.criterion.Example;
 import org.springframework.stereotype.Service;
 
+import com.api.spring.exceptions.ResidentException;
+import com.api.spring.exceptions.ResidentExceptionClass;
 import com.api.spring.models.ResidentModel;
 import com.api.spring.repositories.ResidentRepository;
 
@@ -20,14 +21,14 @@ public class ResidentService {
 	}
 	
 	@Transactional
-	public ResidentModel create(ResidentModel residentModel) {
-		ResidentModel resident = this.residentRepository.findByCpf(residentModel.getCpf());
+	public ResidentModel create(ResidentModel newResident) {
+		ResidentModel resident = this.residentRepository.findByCpf(newResident.getCpf());
 		
-		if(resident == null) {
-			return this.residentRepository.save(residentModel);
+		if(resident != null) {
+			throw new ResidentExceptionClass("Usuário já cadastrado.");
 		}
 		
-		return null;
+		return this.residentRepository.save(newResident);
 	}
 	
 	@Transactional
@@ -52,10 +53,8 @@ public class ResidentService {
 	public String delete(String Cpf) {
 		ResidentModel resident = this.residentRepository.findByCpf(Cpf);
 		
-		System.out.println(Cpf);
-		
-		if(resident == null) {
-			return "Morador não existente.";
+		if(resident == null){
+			throw new ResidentExceptionClass("Morador não existente.");
 		}
 		
 		this.residentRepository.delete(resident);

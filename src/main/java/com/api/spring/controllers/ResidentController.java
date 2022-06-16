@@ -3,7 +3,6 @@ package com.api.spring.controllers;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 
-import javax.persistence.PostUpdate;
 import javax.validation.Valid;
 
 import org.springframework.beans.BeanUtils;
@@ -12,13 +11,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
 import com.api.spring.dto.ResidentModelDTO;
 import com.api.spring.models.ResidentModel;
 import com.api.spring.services.ResidentService;
@@ -42,15 +39,9 @@ public class ResidentController {
 
 		BeanUtils.copyProperties(residentDTO, resident);
 		
-		ResidentModel createdResident = this.residentService.create(resident);
+		resident.setCreatedAt(LocalDateTime.now(ZoneId.of("UTC")));
 		
-		if(createdResident == null) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Resident already registered.");
-		}
-		
-		createdResident.setCreatedAt(LocalDateTime.now(ZoneId.of("UTC")));
-		
-		return ResponseEntity.status(HttpStatus.CREATED).body(createdResident);
+		return ResponseEntity.status(HttpStatus.CREATED).body(this.residentService.create(resident));
 	}
 	
 	@GetMapping
@@ -65,13 +56,7 @@ public class ResidentController {
 		
 		BeanUtils.copyProperties(residentDTO,resident);
 		
-		ResidentModel updatedResident = this.residentService.update(resident);
-		
-		if(updatedResident == null) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User doesn't exists.");
-		}
-		
-		return ResponseEntity.status(HttpStatus.CREATED).body(updatedResident);
+		return ResponseEntity.status(HttpStatus.CREATED).body(this.residentService.update(resident));
 	}
 	
 	@DeleteMapping(value = "/{cpf}")
